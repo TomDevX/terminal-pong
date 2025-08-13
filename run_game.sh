@@ -16,6 +16,7 @@ case $choice in
         if [ $? -eq 0 ]; then
             echo "✅ Ready to challenge the bot!"
             echo "Controls: Use W/S to control your paddle"
+            echo "Features: Speed increases every 3 hits!"
             echo ""
             ./pong_game
         else
@@ -28,6 +29,7 @@ case $choice in
         if [ $? -eq 0 ]; then
             echo "✅ Ready to play!"
             echo "Controls: Player 1 (W/S), Player 2 (I/K)"
+            echo "Features: Speed increases every 3 hits!"
             echo ""
             ./pong_game
         else
@@ -40,6 +42,7 @@ case $choice in
         if [ $? -eq 0 ]; then
             echo "✅ Watch the bots play!"
             echo "Smart Bot vs Patrol Bot"
+            echo "Features: Speed increases every 3 hits!"
             echo "Controls: Q to quit only"
             echo ""
             ./pong_game

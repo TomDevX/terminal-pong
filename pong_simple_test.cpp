@@ -13,7 +13,7 @@ using namespace std;
 #define BOT_MODE 1  // 0=human vs human, 1=human vs bot, 2=bot vs bot
 #endif
 
-// Game variables
+// Game variables - SIMPLIFIED
 bool gameOver = false;
 const int width = 40;  
 const int height = 18; 
@@ -23,9 +23,7 @@ int player1Y, player2Y;
 int player1Score = 0, player2Score = 0;
 const int paddleSize = 4; 
 int frameCount = 0;
-int ballSpeed = 1;     // Speed display
-int hitCount = 0;      // Hit counter
-int ai2Direction = 1;  // For patrol bot
+int hitCount = 0;      // Simple hit counter only
 
 // Terminal
 struct termios oldTermios;
@@ -59,7 +57,6 @@ void Setup() {
     ballDirY = (rand() % 2 == 0) ? 1 : -1;
     player1Y = height / 2 - paddleSize / 2;
     player2Y = height / 2 - paddleSize / 2;
-    ballSpeed = 1;
     hitCount = 0;
     srand(time(0));
 }
@@ -76,14 +73,14 @@ void Draw() {
     }
     
     cout << " (Frame: " << frameCount << ")" << endl;
-    cout << "Score: P1=" << player1Score << " P2=" << player2Score << " | Speed: " << ballSpeed << "x | Hits: " << hitCount << endl;
+    cout << "Score: P1=" << player1Score << " P2=" << player2Score << " | Hits: " << hitCount << endl;
     
     if (BOT_MODE == 0) {
         cout << "Controls: W/S (P1), I/K (P2), Q=quit" << endl;
     } else if (BOT_MODE == 1) {
         cout << "Controls: W/S (You), Q=quit" << endl;
     } else {
-        cout << "Controls: Q=quit (watch bots)" << endl;
+        cout << "Controls: Q=quit (watch bots play)" << endl;
     }
     
     // Game board
@@ -92,6 +89,7 @@ void Draw() {
     
     for (int i = 0; i < height; i++) {
         cout << "|";
+        
         for (int j = 0; j < width; j++) {
             if (i == ballY && j == ballX) {
                 cout << "O";
@@ -105,6 +103,7 @@ void Draw() {
                 cout << " ";
             }
         }
+        
         cout << "|" << endl;
     }
     
@@ -114,24 +113,42 @@ void Draw() {
 
 void Input() {
     char key = getKey();
-    if (key == 'q' || key == 'Q') {
-        gameOver = true;
-    }
-    if (key == 'w' || key == 'W') {
-        if (BOT_MODE != 2 && player1Y > 0) player1Y--;
-    }
-    if (key == 's' || key == 'S') {
-        if (BOT_MODE != 2 && player1Y + paddleSize < height) player1Y++;
-    }
-    if (key == 'i' || key == 'I') {
-        if (BOT_MODE == 0 && player2Y > 0) player2Y--;
-    }
-    if (key == 'k' || key == 'K') {
-        if (BOT_MODE == 0 && player2Y + paddleSize < height) player2Y++;
+    if (key != 0) {
+        switch (key) {
+            case 'w':
+            case 'W':
+                if (BOT_MODE != 2 && player1Y > 0) {
+                    player1Y--;
+                }
+                break;
+            case 's':
+            case 'S':
+                if (BOT_MODE != 2 && player1Y + paddleSize < height) {
+                    player1Y++;
+                }
+                break;
+            case 'i':
+            case 'I':
+                if (BOT_MODE == 0 && player2Y > 0) {
+                    player2Y--;
+                }
+                break;
+            case 'k':
+            case 'K':
+                if (BOT_MODE == 0 && player2Y + paddleSize < height) {
+                    player2Y++;
+                }
+                break;
+            case 'q':
+            case 'Q':
+                gameOver = true;
+                break;
+        }
     }
 }
 
-void UpdateSmartBot(int &paddleY) {
+void UpdateBot(int &paddleY) {
+    // Simple bot AI
     if (ballY < paddleY + paddleSize / 2 && paddleY > 0) {
         paddleY--;
     } else if (ballY > paddleY + paddleSize / 2 && paddleY + paddleSize < height) {
@@ -139,52 +156,35 @@ void UpdateSmartBot(int &paddleY) {
     }
 }
 
-void UpdatePatrolBot(int &paddleY, int &direction) {
-    paddleY += direction;
-    if (paddleY <= 0) {
-        paddleY = 0;
-        direction = 1;
-    } else if (paddleY + paddleSize >= height) {
-        paddleY = height - paddleSize;
-        direction = -1;
-    }
-}
-
 void Logic() {
     frameCount++;
     
-    // Simple ball movement - NO LOOPS
+    // Simple ball movement - NO SPEED MULTIPLIER
     ballX += ballDirX;
     ballY += ballDirY;
     
-    // Wall collision
+    // Ball collision with top and bottom walls
     if (ballY <= 0 || ballY >= height - 1) {
         ballDirY = -ballDirY;
         ballY = (ballY <= 0) ? 0 : height - 1;
     }
     
-    // Paddle collision with speed increase
+    // Ball collision with paddles - SIMPLE VERSION
     if (ballX == 3 && ballY >= player1Y && ballY < player1Y + paddleSize && ballDirX < 0) {
         ballDirX = 1;
-        hitCount++;
-        if (hitCount % 3 == 0 && ballSpeed < 5) {
-            ballSpeed++;
-        }
+        hitCount++;  // Just count hits, no speed change
     }
     if (ballX == width - 4 && ballY >= player2Y && ballY < player2Y + paddleSize && ballDirX > 0) {
         ballDirX = -1;
-        hitCount++;
-        if (hitCount % 3 == 0 && ballSpeed < 5) {
-            ballSpeed++;
-        }
+        hitCount++;  // Just count hits, no speed change
     }
     
     // AI updates
     if (BOT_MODE == 1) {
-        UpdateSmartBot(player2Y);
+        UpdateBot(player2Y);
     } else if (BOT_MODE == 2) {
-        UpdateSmartBot(player1Y);
-        UpdatePatrolBot(player2Y, ai2Direction);
+        UpdateBot(player1Y);
+        UpdateBot(player2Y);
     }
     
     // Scoring
@@ -193,8 +193,6 @@ void Logic() {
         ballX = width / 2;
         ballY = height / 2;
         ballDirX = 1;
-        ballSpeed = 1;  // Reset speed
-        hitCount = 0;
     }
     
     if (ballX >= width - 1) {
@@ -202,47 +200,21 @@ void Logic() {
         ballX = width / 2;
         ballY = height / 2;
         ballDirX = -1;
-        ballSpeed = 1;  // Reset speed
-        hitCount = 0;
     }
     
     // Win condition
     if (player1Score >= 5 || player2Score >= 5) {
         cout << "\033[2J\033[H";
-        cout << "🏆 GAME OVER!" << endl;
+        cout << "🏆 GAME OVER! 🏆" << endl;
         cout << "Final Score: " << player1Score << " - " << player2Score << endl;
-        
-        if (BOT_MODE == 0) {
-            cout << (player1Score > player2Score ? "🎉 Player 1 Wins!" : "🎉 Player 2 Wins!") << endl;
-        } else if (BOT_MODE == 1) {
-            cout << (player1Score > player2Score ? "🎉 You Win!" : "🤖 Bot Wins!") << endl;
-        } else {
-            cout << (player1Score > player2Score ? "🧠 Smart Bot Wins!" : "🤖 Patrol Bot Wins!") << endl;
-        }
         gameOver = true;
     }
 }
 
 int main() {
     cout << "\033[2J\033[H";
-    
-    if (BOT_MODE == 0) {
-        cout << "👥 HUMAN vs HUMAN PONG" << endl;
-        cout << "Player 1: W (up) / S (down)" << endl;
-        cout << "Player 2: I (up) / K (down)" << endl;
-    } else if (BOT_MODE == 1) {
-        cout << "🧠 HUMAN vs BOT PONG" << endl;
-        cout << "You: W (up) / S (down)" << endl;
-        cout << "Bot: Auto-follows ball" << endl;
-    } else {
-        cout << "🤖 BOT vs BOT DEMO" << endl;
-        cout << "Smart Bot vs Patrol Bot" << endl;
-        cout << "Just watch them play!" << endl;
-    }
-    
-    cout << "Press Q to quit anytime" << endl;
-    cout << "Speed increases every 3 hits!" << endl;
-    cout << "Starting in 2 seconds..." << endl;
+    cout << "🧪 SIMPLIFIED PONG (No Speed System)" << endl;
+    cout << "Testing if freeze issue is from speed system..." << endl;
     this_thread::sleep_for(chrono::seconds(2));
     
     setupTerminal();
@@ -252,16 +224,7 @@ int main() {
         Draw();
         Input();
         Logic();
-        
-        // Simple speed system - big differences to feel the change
-        int delay;
-        if (ballSpeed == 1) delay = 140;      // Default - reasonably fast
-        else if (ballSpeed == 2) delay = 110; // Noticeably faster
-        else if (ballSpeed == 3) delay = 80;  // Much faster
-        else if (ballSpeed == 4) delay = 55;  // Very fast
-        else delay = 35;                      // Extremely fast (speed 5)
-        
-        this_thread::sleep_for(chrono::milliseconds(delay));
+        this_thread::sleep_for(chrono::milliseconds(150));
     }
     
     restoreTerminal();
