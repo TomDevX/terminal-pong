@@ -170,7 +170,7 @@ terminal-pong/
 ```
 
 ## 🎥 Demo
-
+### Terminal display
 ```
 🧠 HUMAN vs BOT (Frame: 45)
 Score: P1=2 P2=1 | Speed: 3x | Hits: 7
@@ -196,6 +196,8 @@ Controls: W/S (You), Q=quit
 |                 |                      |
 ==========================================
 ```
+### Video
+(!Demo video)[https://github.com/user-attachments/assets/307d480f-552a-4c56-a1e7-ccfa0e6505b9]
 
 ## 📱 Quick Links
 
