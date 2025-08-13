@@ -32,7 +32,7 @@ A modern, stable Pong game implementation in C++ with dynamic speed system and m
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/TomDevX/terminal-pong/refs/tags/v4/terminal_pong_installer.sh)"
 ```
 
-### **Method 2: Download File & Run**
+### **Method 2: Download File & Run (wget downloaded required)**
 ```bash
 # Download the game file:
 wget https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh
@@ -42,7 +42,7 @@ chmod +x terminal_pong_installer.sh
 ./terminal_pong_installer.sh
 ```
 
-### **Method 3: Manual Download**
+### **Method 3: Manual Download (also check the release)**
 1. [**Download terminal_pong_installer.sh**](https://github.com/TomDevX/terminal-pong/releases/download/untagged-0a4a38898f9f53b15e9d/terminal_pong_installer.sh)
 2. Open Terminal and navigate to download folder
 3. Run: `chmod +x terminal_pong_installer.sh && ./terminal_pong_installer.sh`
