@@ -1,34 +1,37 @@
 @echo off
+chcp 65001 >nul
 :: 🏓 Terminal Pong Game - Windows Installer & Runner
 :: Download this file and double-click to run, or run from Command Prompt
 
-echo 🏓 Terminal Pong Game - Windows Installer
+echo Terminal Pong Game - Windows Installer
 echo =============================================
 
 :: Check if g++ is available
 where g++ >nul 2>nul
 if %errorlevel% neq 0 (
-    echo ❌ g++ compiler not found!
+    echo [X] g++ compiler not found!
     echo.
     echo Please install g++ first:
     echo   Option 1: Install MinGW-w64 from https://www.mingw-w64.org/
     echo   Option 2: Install MSYS2 from https://www.msys2.org/
     echo   Option 3: Install Visual Studio Build Tools
-    echo   Option 4: Install Git Bash (includes g++)
+    echo   Option 4: Install Git Bash ^(includes g++^)
+    echo.
+    echo After installation, restart Command Prompt and try again.
     echo.
     pause
     exit /b 1
 )
 
-echo ✅ Compiler found!
-g++ --version | findstr /C:"g++"
+echo [OK] Compiler found!
+for /f "delims=" %%i in ('g++ --version 2^>nul ^| findstr /C:"g++"') do echo %%i
 
 :: Create temporary directory
 set TEMP_DIR=%TEMP%\terminal_pong_%RANDOM%
-mkdir "%TEMP_DIR%"
+mkdir "%TEMP_DIR%" >nul 2>nul
 cd /d "%TEMP_DIR%"
 
-echo 📁 Creating game files...
+echo [INFO] Creating game files...
 
 :: Create the game source code
 (
@@ -273,61 +276,73 @@ echo     return 0;
 echo }
 ) > pong_game.cpp
 
-echo 🏓 Welcome to Terminal Pong! 🏓
+echo.
+echo === Terminal Pong Game ===
 echo.
 echo Choose game mode:
-echo 1. 🧠 Human vs Bot
-echo 2. 👥 Human vs Human  
-echo 3. 🤖 Bot vs Bot
+echo 1. Human vs Bot
+echo 2. Human vs Human  
+echo 3. Bot vs Bot Demo
 echo.
 set /p choice="Enter your choice (1-3): "
 
 if "%choice%"=="1" (
-    echo 🧠 Starting Human vs Bot mode...
-    g++ -std=c++11 -DBOT_MODE=1 pong_game.cpp -o pong_game.exe
+    echo.
+    echo [INFO] Starting Human vs Bot mode...
+    g++ -std=c++11 -DBOT_MODE=1 pong_game.cpp -o pong_game.exe 2>nul
     if %errorlevel% equ 0 (
-        echo ✅ Ready to challenge the bot!
+        echo [OK] Compilation successful!
         echo Controls: Use W/S to control your paddle
-        echo Features: Speed increases every 3 hits!
+        echo Press Q to quit anytime
         echo.
+        echo Starting game in 3 seconds...
+        timeout /t 3 >nul
         pong_game.exe
     ) else (
-        echo ❌ Compilation error!
+        echo [X] Compilation failed! Check if you have g++ installed.
     )
 ) else if "%choice%"=="2" (
-    echo 👥 Starting Human vs Human mode...
-    g++ -std=c++11 -DBOT_MODE=0 pong_game.cpp -o pong_game.exe
+    echo.
+    echo [INFO] Starting Human vs Human mode...
+    g++ -std=c++11 -DBOT_MODE=0 pong_game.cpp -o pong_game.exe 2>nul
     if %errorlevel% equ 0 (
-        echo ✅ Ready to play!
+        echo [OK] Compilation successful!
         echo Controls: Player 1 (W/S), Player 2 (I/K)
-        echo Features: Speed increases every 3 hits!
+        echo Press Q to quit anytime
         echo.
+        echo Starting game in 3 seconds...
+        timeout /t 3 >nul
         pong_game.exe
     ) else (
-        echo ❌ Compilation error!
+        echo [X] Compilation failed! Check if you have g++ installed.
     )
 ) else if "%choice%"=="3" (
-    echo 🤖 Starting Bot vs Bot demo...
-    g++ -std=c++11 -DBOT_MODE=2 pong_game.cpp -o pong_game.exe
+    echo.
+    echo [INFO] Starting Bot vs Bot demo...
+    g++ -std=c++11 -DBOT_MODE=2 pong_game.cpp -o pong_game.exe 2>nul
     if %errorlevel% equ 0 (
-        echo ✅ Watch the bots play!
-        echo Smart Bot vs Patrol Bot
-        echo Features: Speed increases every 3 hits!
-        echo Controls: Q to quit only
+        echo [OK] Compilation successful!
+        echo Watch the AI bots battle!
+        echo Press Q to quit anytime
         echo.
+        echo Starting demo in 3 seconds...
+        timeout /t 3 >nul
         pong_game.exe
     ) else (
-        echo ❌ Compilation error!
+        echo [X] Compilation failed! Check if you have g++ installed.
     )
 ) else (
-    echo ❌ Invalid choice. Please run the script again.
+    echo [X] Invalid choice "%choice%". Please run the script again.
+    pause
+    exit /b 1
 )
 
 :: Cleanup
 cd /d "%USERPROFILE%"
-rmdir /s /q "%TEMP_DIR%"
+if exist "%TEMP_DIR%" rmdir /s /q "%TEMP_DIR%" >nul 2>nul
 
 echo.
-echo 🎉 Thanks for playing Terminal Pong!
-echo 💾 To install permanently, visit: https://github.com/TomDevX/terminal-pong
+echo [INFO] Thanks for playing Terminal Pong!
+echo Visit: https://github.com/TomDevX/terminal-pong
+echo.
 pause

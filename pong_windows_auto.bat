@@ -1,41 +1,115 @@
 @echo off
 chcp 65001 >nul 2>nul
-title Terminal Pong Game
+title Terminal Pong Game - Auto Installer
 
 echo ================================================
-echo          Terminal Pong Game for Windows
+echo     Terminal Pong Game - Auto Installer
 echo ================================================
+
+:: Check if running as Administrator
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [INFO] This script will try to install dependencies automatically.
+    echo [INFO] For best results, run as Administrator.
+    echo.
+    timeout /t 3 >nul
+)
 
 :: Check if g++ is available
+echo Checking for C++ compiler...
 where g++ >nul 2>nul
 if %errorlevel% neq 0 (
     echo [WARNING] g++ compiler not found!
     echo.
-    echo OPTION 1: Quick Install via Chocolatey (Recommended)
-    echo   Run as Administrator: choco install mingw
+    echo Attempting automatic installation...
     echo.
-    echo OPTION 2: Manual Install
-    echo   1. Download Git for Windows: https://git-scm.com/download/win
-    echo   2. During installation, select "Git Bash Here" and "Git from command line"
-    echo   3. Restart Command Prompt
-    echo.
-    echo OPTION 3: MSYS2
-    echo   Download from: https://www.msys2.org/
-    echo.
-    echo.
-    set /p install_choice="Try to continue anyway? (y/n): "
-    if /i "%install_choice%"=="n" (
+    
+    :: Try Chocolatey first
+    where choco >nul 2>nul
+    if %errorlevel% equ 0 (
+        echo [INFO] Found Chocolatey. Installing MinGW...
+        choco install mingw -y
         echo.
-        echo After installing g++, restart Command Prompt and run this script again.
-        pause
-        exit /b 1
+        echo [INFO] Refreshing PATH...
+        call refreshenv
+        
+        :: Check again
+        where g++ >nul 2>nul
+        if %errorlevel% equ 0 (
+            echo [SUCCESS] g++ installed successfully!
+        ) else (
+            echo [WARNING] g++ installation may need PATH refresh.
+            echo [INFO] Please restart Command Prompt and try again.
+            echo.
+            set /p continue="Continue anyway? (y/n): "
+            if /i "!continue!"=="n" (
+                pause
+                exit /b 1
+            )
+        )
+    ) else (
+        echo [INFO] Chocolatey not found. Installing Chocolatey first...
+        echo.
+        
+        :: Install Chocolatey
+        powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+        
+        if %errorlevel% equ 0 (
+            echo [SUCCESS] Chocolatey installed!
+            echo [INFO] Installing MinGW...
+            
+            :: Refresh PATH and install MinGW
+            call refreshenv
+            choco install mingw -y
+            
+            :: Check if g++ is now available
+            where g++ >nul 2>nul
+            if %errorlevel% equ 0 (
+                echo [SUCCESS] g++ installed successfully!
+            ) else (
+                echo [WARNING] Automatic installation completed.
+                echo [INFO] Please restart Command Prompt and try again.
+                echo.
+                echo Manual install option:
+                echo   Download Git for Windows: https://git-scm.com/download/win
+                echo.
+                set /p continue="Continue anyway? (y/n): "
+                if /i "!continue!"=="n" (
+                    pause
+                    exit /b 1
+                )
+            )
+        ) else (
+            echo [ERROR] Failed to install Chocolatey automatically.
+            echo.
+            echo MANUAL INSTALLATION REQUIRED:
+            echo.
+            echo Option 1 - Git for Windows (Easiest):
+            echo   1. Download: https://git-scm.com/download/win
+            echo   2. Install with default options
+            echo   3. Restart Command Prompt
+            echo.
+            echo Option 2 - MSYS2:
+            echo   1. Download: https://www.msys2.org/
+            echo   2. Install and follow setup instructions
+            echo.
+            echo Option 3 - Visual Studio Build Tools:
+            echo   1. Download: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
+            echo.
+            set /p continue="Continue without compiler? (y/n): "
+            if /i "!continue!"=="n" (
+                pause
+                exit /b 1
+            )
+        )
     )
-    echo.
-    echo [INFO] Continuing without compiler... Will use alternative method.
-    echo.
+) else (
+    echo [OK] Compiler detected: 
+    g++ --version | head -1
 )
 
-echo [OK] Compiler detected
+echo.
+echo ================================================
 echo.
 
 :: Create temporary directory
@@ -43,11 +117,7 @@ set TEMP_DIR=%TEMP%\pong_%RANDOM%
 mkdir "%TEMP_DIR%" >nul 2>nul
 cd /d "%TEMP_DIR%"
 
-:: Check if we have compiler or need alternative method
-where g++ >nul 2>nul
-set HAS_COMPILER=%errorlevel%
-
-:: Create simplified C++ source
+:: Create C++ source code
 echo Creating game source...
 (
 echo #include ^<iostream^>
@@ -173,71 +243,69 @@ echo     }
 echo     cout ^<^< "\\nThanks for playing! Press any key to exit..."; _getch^(^);
 echo     return 0;
 echo }
-) > pong_simple.cpp
+) > pong_game.cpp
 
 echo.
 echo === TERMINAL PONG GAME ===
 echo.
 echo Choose game mode:
 echo   1. Human vs Bot
-echo   2. Human vs Human
+echo   2. Human vs Human  
 echo   3. Bot vs Bot (Demo)
 echo.
 set /p choice="Enter choice (1-3): "
 
+:: Check if compiler is available for compilation
+where g++ >nul 2>nul
+set COMPILER_AVAILABLE=%errorlevel%
+
 if "%choice%"=="1" (
     echo.
-    if %HAS_COMPILER% equ 0 (
+    if %COMPILER_AVAILABLE% equ 0 (
         echo Compiling Human vs Bot mode...
-        g++ -DBOT_MODE=1 pong_simple.cpp -o pong.exe 2>nul
+        g++ -DBOT_MODE=1 pong_game.cpp -o pong.exe 2>nul
         if %errorlevel% equ 0 (
             echo [OK] Starting game...
+            echo.
             pong.exe
         ) else (
-            echo [ERROR] Compilation failed
+            echo [ERROR] Compilation failed. Check your g++ installation.
         )
     ) else (
-        echo [INFO] No compiler available. 
-        echo Please install g++ first and run this script again.
-        echo.
-        echo Quick install: As Administrator run: choco install mingw
-        echo Or download Git for Windows: https://git-scm.com/download/win
+        echo [ERROR] No compiler available. Installation may have failed.
+        echo Please restart Command Prompt and try again.
     )
 ) else if "%choice%"=="2" (
     echo.
-    if %HAS_COMPILER% equ 0 (
+    if %COMPILER_AVAILABLE% equ 0 (
         echo Compiling Human vs Human mode...
-        g++ -DBOT_MODE=0 pong_simple.cpp -o pong.exe 2>nul
+        g++ -DBOT_MODE=0 pong_game.cpp -o pong.exe 2>nul
         if %errorlevel% equ 0 (
             echo [OK] Starting game...
+            echo.
             pong.exe
         ) else (
-            echo [ERROR] Compilation failed
+            echo [ERROR] Compilation failed. Check your g++ installation.
         )
     ) else (
-        echo [INFO] No compiler available. 
-        echo Please install g++ first and run this script again.
-        echo.
-        echo Quick install: As Administrator run: choco install mingw
-        echo Or download Git for Windows: https://git-scm.com/download/win
+        echo [ERROR] No compiler available. Installation may have failed.
+        echo Please restart Command Prompt and try again.
     )
 ) else if "%choice%"=="3" (
     echo.
-    if %HAS_COMPILER% equ 0 (
+    if %COMPILER_AVAILABLE% equ 0 (
         echo Compiling Bot vs Bot demo...
-        g++ -DBOT_MODE=2 pong_simple.cpp -o pong.exe 2>nul
+        g++ -DBOT_MODE=2 pong_game.cpp -o pong.exe 2>nul
         if %errorlevel% equ 0 (
             echo [OK] Starting demo...
+            echo.
             pong.exe
         ) else (
-            echo [ERROR] Compilation failed
+            echo [ERROR] Compilation failed. Check your g++ installation.
         )
     ) else (
-        echo [INFO] No compiler available. 
-        echo Please install g++ first and run this script again.
-        echo.
-        echo Quick install: As Administrator run: choco install mingw
-        echo Or download Git for Windows: https://git-scm.com/download/win
+        echo [ERROR] No compiler available. Installation may have failed.
+        echo Please restart Command Prompt and try again.
     )
 ) else (
     echo [ERROR] Invalid choice: %choice%
@@ -248,6 +316,12 @@ cd /d %USERPROFILE%
 if exist "%TEMP_DIR%" rmdir /s /q "%TEMP_DIR%" >nul 2>nul
 
 echo.
+echo ================================================
 echo Thanks for playing Terminal Pong!
-echo Visit: https://github.com/TomDevX/terminal-pong
+echo.
+echo If you had issues, try:
+echo   1. Run as Administrator
+echo   2. Restart Command Prompt after installation
+echo   3. Visit: https://github.com/TomDevX/terminal-pong
+echo ================================================
 pause

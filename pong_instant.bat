@@ -1,0 +1,1 @@
+@echo off & powershell -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_powershell.ps1'))"
