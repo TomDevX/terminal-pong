@@ -245,107 +245,131 @@ void Logic() {
     }
 }
 
-int main() {
+void showMenu() {
     cout << "\033[2J\033[H";
+    cout << "🏓 Welcome to Terminal Pong! 🏓" << endl;
+    cout << "===============================" << endl;
+    cout << "Choose game mode:" << endl;
+    cout << "1. 🧠 Human vs Bot" << endl;
+    cout << "2. 👥 Human vs Human" << endl;
+    cout << "3. 🤖 Bot vs Bot (Demo)" << endl;
+    cout << "4. ❌ Exit" << endl;
+    cout << "===============================" << endl;
+    cout << "Enter your choice (1-4): ";
+}
+
+int main() {
+    showMenu();
     
-    if (BOT_MODE == 0) {
-        cout << "👥 HUMAN vs HUMAN PONG" << endl;
-        cout << "Player 1: W (up) / S (down)" << endl;
-        cout << "Player 2: I (up) / K (down)" << endl;
-    } else if (BOT_MODE == 1) {
-        cout << "🧠 HUMAN vs BOT PONG" << endl;
-        cout << "You: W (up) / S (down)" << endl;
-        cout << "Bot: Auto-follows ball" << endl;
+    char choice;
+    cin >> choice;
+    
+    int mode;
+    string modeDesc;
+    string controls;
+    
+    switch (choice) {
+        case '1':
+            mode = 1;
+            modeDesc = "🧠 Starting Human vs Bot mode...";
+            controls = "Controls: Use W/S to control your paddle";
+            break;
+        case '2':
+            mode = 0;
+            modeDesc = "👥 Starting Human vs Human mode...";
+            controls = "Controls: Player 1 (W/S), Player 2 (I/K)";
+            break;
+        case '3':
+            mode = 2;
+            modeDesc = "🤖 Starting Bot vs Bot demo...";
+            controls = "Smart Bot vs Patrol Bot - Q to quit only";
+            break;
+        default:
+            cout << "❌ Invalid choice. Exiting." << endl;
+            return 1;
+    }
+    
+    cout << modeDesc << endl;
+    
+    // Compile for the specific mode
+    string compileCmd = "g++ -std=c++11 -DBOT_MODE=" + to_string(mode) + " pong_game.cpp -o pong_game";
+    if (system(compileCmd.c_str()) == 0) {
+        cout << "✅ Ready to play!" << endl;
+        cout << controls << endl;
+        cout << "Features: Speed increases every 3 hits!" << endl;
+        cout << "" << endl;
+        system("./pong_game");
     } else {
-        cout << "🤖 BOT vs BOT DEMO" << endl;
-        cout << "Smart Bot vs Patrol Bot" << endl;
-        cout << "Just watch them play!" << endl;
+        cout << "❌ Compilation error!" << endl;
+        return 1;
     }
     
-    cout << "Press Q to quit anytime" << endl;
-    cout << "Speed increases every 3 hits!" << endl;
-    cout << "Starting in 2 seconds..." << endl;
-    this_thread::sleep_for(chrono::seconds(2));
-    
-    setupTerminal();
-    Setup();
-    
-    while (!gameOver) {
-        Draw();
-        Input();
-        Logic();
-        
-        // Simple speed system - big differences to feel the change
-        int delay;
-        if (ballSpeed == 1) delay = 140;      // Default - reasonably fast
-        else if (ballSpeed == 2) delay = 110; // Noticeably faster
-        else if (ballSpeed == 3) delay = 80;  // Much faster
-        else if (ballSpeed == 4) delay = 55;  // Very fast
-        else delay = 35;                      // Extremely fast (speed 5)
-        
-        this_thread::sleep_for(chrono::milliseconds(delay));
-    }
-    
-    restoreTerminal();
     return 0;
 }
 EOF_GAME_SOURCE
 
-echo "🏓 Welcome to Terminal Pong! 🏓"
-echo ""
-echo "Choose game mode:"
-echo "========================="
-echo "1. 🧠 Human vs Bot"
-echo "2. 👥 Human vs Human"
-echo "3. 🤖 Bot vs Bot"
-echo "========================="
-read -p "Enter your choice (1-3): " choice
-
-case $choice in
-    1)
-        echo "🧠 Starting Human vs Bot mode..."
-        g++ -std=c++11 -DBOT_MODE=1 pong_game.cpp -o pong_game
-        if [ $? -eq 0 ]; then
-            echo "✅ Ready to challenge the bot!"
-            echo "Controls: Use W/S to control your paddle"
-            echo "Features: Speed increases every 3 hits!"
-            echo ""
-            ./pong_game
-        else
-            echo "❌ Compilation error!"
-        fi
-        ;;
-    2)
-        echo "👥 Starting Human vs Human mode..."
-        g++ -std=c++11 -DBOT_MODE=0 pong_game.cpp -o pong_game
-        if [ $? -eq 0 ]; then
-            echo "✅ Ready to play!"
-            echo "Controls: Player 1 (W/S), Player 2 (I/K)"
-            echo "Features: Speed increases every 3 hits!"
-            echo ""
-            ./pong_game
-        else
-            echo "❌ Compilation error!"
-        fi
-        ;;
-    3)
-        echo "🤖 Starting Bot vs Bot demo..."
-        g++ -std=c++11 -DBOT_MODE=2 pong_game.cpp -o pong_game
-        if [ $? -eq 0 ]; then
-            echo "✅ Watch the bots play!"
-            echo "Smart Bot vs Patrol Bot"
-            echo "Features: Speed increases every 3 hits!"
-            echo "Controls: Q to quit only"
-            echo ""
-            ./pong_game
-        else
-            echo "❌ Compilation error!"
-        fi
-        ;;
-    *)
-        echo "❌ Invalid choice. Please run the script again."
-        ;;
-esac
+echo "🔨 Compiling game..."
+if g++ -std=c++11 pong_game.cpp -o terminal_pong; then
+    echo "✅ Compilation successful!"
+    echo ""
+    echo "� Welcome to Pong Game! 🏓"
+    echo ""
+    echo "Choose game mode:"
+    echo "1. 🧠 Human vs Bot"
+    echo "2. 👥 Human vs Human"
+    echo "3. 🤖 Bot vs Bot"
+    echo ""
+    read -p "Enter your choice (1-3): " choice
+    
+    case $choice in
+        1)
+            echo "🧠 Starting Human vs Bot mode..."
+            g++ -std=c++11 -DBOT_MODE=1 pong_game.cpp -o pong_game
+            if [ $? -eq 0 ]; then
+                echo "✅ Ready to challenge the bot!"
+                echo "Controls: Use W/S to control your paddle"
+                echo "Features: Speed increases every 3 hits!"
+                echo ""
+                ./pong_game
+            else
+                echo "❌ Compilation error!"
+            fi
+            ;;
+        2)
+            echo "👥 Starting Human vs Human mode..."
+            g++ -std=c++11 -DBOT_MODE=0 pong_game.cpp -o pong_game
+            if [ $? -eq 0 ]; then
+                echo "✅ Ready to play!"
+                echo "Controls: Player 1 (W/S), Player 2 (I/K)"
+                echo "Features: Speed increases every 3 hits!"
+                echo ""
+                ./pong_game
+            else
+                echo "❌ Compilation error!"
+            fi
+            ;;
+        3)
+            echo "🤖 Starting Bot vs Bot demo..."
+            g++ -std=c++11 -DBOT_MODE=2 pong_game.cpp -o pong_game
+            if [ $? -eq 0 ]; then
+                echo "✅ Watch the bots play!"
+                echo "Smart Bot vs Patrol Bot"
+                echo "Features: Speed increases every 3 hits!"
+                echo "Controls: Q to quit only"
+                echo ""
+                ./pong_game
+            else
+                echo "❌ Compilation error!"
+            fi
+            ;;
+        *)
+            echo "❌ Invalid choice. Please run the script again."
+            ;;
+    esac
+else
+    echo "❌ Initial compilation failed!"
+    exit 1
+fi
 
 # Cleanup
 cd /
