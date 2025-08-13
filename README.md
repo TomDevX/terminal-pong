@@ -197,7 +197,7 @@ Controls: W/S (You), Q=quit
 ==========================================
 ```
 ### Video
-(!Demo video)[https://github.com/user-attachments/assets/307d480f-552a-4c56-a1e7-ccfa0e6505b9]
+[!Demo video](https://github.com/user-attachments/assets/307d480f-552a-4c56-a1e7-ccfa0e6505b9)
 
 ## 📱 Quick Links
 
