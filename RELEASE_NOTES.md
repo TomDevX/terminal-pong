@@ -1,4 +1,4 @@
-# 🏓 Terminal Pong v1.0 - One-File Game Release
+# 🏓 Terminal Pong v4.0 - One-File Game Release
 
 ## 🎮 **Instant Play - No Setup Required!**
 
