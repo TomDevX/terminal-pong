@@ -29,7 +29,7 @@ A modern, stable Pong game implementation in C++ with dynamic speed system and m
 ### **Method 1: Direct Download & Play**
 ```bash
 # Play instantly (one command):
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/TomDevX/terminal-pong/refs/tags/v4/terminal_pong_installer.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/TomDevX/terminal-pong/refs/tags/v5/terminal_pong_installer.sh)"
 ```
 
 ### **Method 2: Download File & Run (wget downloaded required)**
@@ -210,4 +210,4 @@ Controls: W/S (You), Q=quit
 
 **Made with ❤️ by TomDevX using GitHub Copilot**
 
-*Last updated: August 13, 2025 - Stable release with dynamic speed system*
+*Last updated: August 14, 2025 - Stable release with dynamic speed system*
