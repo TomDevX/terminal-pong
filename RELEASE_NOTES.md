@@ -14,7 +14,7 @@ chmod +x terminal_pong_installer.sh
 ./terminal_pong_installer.sh
 ```
 
-## ✨ **What's New in v1.0**
+## ✨ **What's New in v4.0**
 
 ### 🚀 **One-File Solution**
 - **Self-contained installer** - all source code embedded
@@ -68,6 +68,9 @@ chmod +x terminal_pong_installer.sh
 
 ## 🎉 **Try It Now!**
 
+### Full game walkthrough
+[!Full game](https://github.com/user-attachments/assets/307d480f-552a-4c56-a1e7-ccfa0e6505b9)
+
 **Fastest way to play:**
 ```bash
 curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh | bash
@@ -80,6 +83,6 @@ curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_po
 
 ---
 
-**Made with ❤️ by TomDevX using GitHub Copilot**
+**Made with ❤️ by [TomDevX](https://github.com/TomDevX) using GitHub Copilot**
 
 *Compatible with all Unix-like systems. Requires g++ compiler.*
