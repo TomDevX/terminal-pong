@@ -10,7 +10,7 @@
 using namespace std;
 
 #ifndef BOT_MODE
-#define BOT_MODE 1  // 0=human vs human, 1=human vs bot, 2=bot vs bot
+#define BOT_MODE 1  // 1 = human vs bot
 #endif
 
 // Game variables
@@ -23,7 +23,6 @@ int player1Y, player2Y;
 int player1Score = 0, player2Score = 0;
 const int paddleSize = 4; 
 int frameCount = 0;
-int ai2Direction = 1;  // For patrol bot in bot vs bot mode
 
 // Terminal
 struct termios oldTermios;
@@ -62,26 +61,9 @@ void Setup() {
 
 void Draw() {
     cout << "\033[H"; // Move to top
-    
-    if (BOT_MODE == 0) {
-        cout << "👥 HUMAN vs HUMAN";
-    } else if (BOT_MODE == 1) {
-        cout << "🧠 HUMAN vs BOT";
-    } else {
-        cout << "🤖 BOT vs BOT";
-    }
-    
-    cout << " (Frame: " << frameCount << ")" << endl;
+    cout << "🧠 SIMPLE HUMAN vs BOT (Frame: " << frameCount << ")" << endl;
     cout << "Score: P1=" << player1Score << " P2=" << player2Score << endl;
-    
-    if (BOT_MODE == 0) {
-        cout << "Controls: W/S (P1), I/K (P2), Q=quit" << endl;
-    } else if (BOT_MODE == 1) {
-        cout << "Controls: W/S (You), Q=quit" << endl;
-    } else {
-        cout << "Controls: Q=quit (watch bots play)" << endl;
-    }
-    
+    cout << "Controls: W/S (Player 1), Q=quit" << endl;
     cout << "Ball at (" << ballX << "," << ballY << ")" << endl;
     
     // Game board
@@ -120,30 +102,16 @@ void Input() {
         switch (key) {
             case 'w':
             case 'W':
-                if (BOT_MODE != 2 && player1Y > 0) {  // Not in bot vs bot mode
+                if (player1Y > 0) {
                     player1Y--;
                     cout << "P1↑(" << player1Y << ") ";
                 }
                 break;
             case 's':
             case 'S':
-                if (BOT_MODE != 2 && player1Y + paddleSize < height) {  // Not in bot vs bot mode
+                if (player1Y + paddleSize < height) {
                     player1Y++;
                     cout << "P1↓(" << player1Y << ") ";
-                }
-                break;
-            case 'i':
-            case 'I':
-                if (BOT_MODE == 0 && player2Y > 0) {  // Only in human vs human mode
-                    player2Y--;
-                    cout << "P2↑(" << player2Y << ") ";
-                }
-                break;
-            case 'k':
-            case 'K':
-                if (BOT_MODE == 0 && player2Y + paddleSize < height) {  // Only in human vs human mode
-                    player2Y++;
-                    cout << "P2↓(" << player2Y << ") ";
                 }
                 break;
             case 'q':
@@ -156,24 +124,12 @@ void Input() {
     }
 }
 
-void UpdateSmartBot(int &paddleY) {
-    // Smart bot follows ball
-    if (ballY < paddleY + paddleSize / 2 && paddleY > 0) {
-        paddleY--;
-    } else if (ballY > paddleY + paddleSize / 2 && paddleY + paddleSize < height) {
-        paddleY++;
-    }
-}
-
-void UpdatePatrolBot(int &paddleY, int &direction) {
-    // Patrol bot moves up and down automatically
-    paddleY += direction;
-    if (paddleY <= 0) {
-        paddleY = 0;
-        direction = 1;
-    } else if (paddleY + paddleSize >= height) {
-        paddleY = height - paddleSize;
-        direction = -1;
+void UpdateBot() {
+    // Simple bot AI for player 2
+    if (ballY < player2Y + paddleSize / 2 && player2Y > 0) {
+        player2Y--;
+    } else if (ballY > player2Y + paddleSize / 2 && player2Y + paddleSize < height) {
+        player2Y++;
     }
 }
 
@@ -198,15 +154,8 @@ void Logic() {
         ballDirX = -1;
     }
     
-    // AI updates based on mode
-    if (BOT_MODE == 1) {
-        // Human vs Bot: Player 2 is smart bot
-        UpdateSmartBot(player2Y);
-    } else if (BOT_MODE == 2) {
-        // Bot vs Bot: Player 1 is smart bot, Player 2 is patrol bot
-        UpdateSmartBot(player1Y);
-        UpdatePatrolBot(player2Y, ai2Direction);
-    }
+    // Update bot
+    UpdateBot();
     
     // Scoring
     if (ballX <= 0) {
@@ -228,37 +177,16 @@ void Logic() {
         cout << "\033[2J\033[H";
         cout << "🏆 GAME OVER! 🏆" << endl;
         cout << "Final Score: Player 1: " << player1Score << " - Player 2: " << player2Score << endl;
-        
-        if (BOT_MODE == 0) {
-            cout << (player1Score > player2Score ? "🎉 Player 1 Wins!" : "🎉 Player 2 Wins!") << endl;
-        } else if (BOT_MODE == 1) {
-            cout << (player1Score > player2Score ? "🎉 You Win!" : "🤖 Bot Wins!") << endl;
-        } else {
-            cout << (player1Score > player2Score ? "🧠 Smart Bot Wins!" : "🤖 Patrol Bot Wins!") << endl;
-        }
+        cout << (player1Score > player2Score ? "🎉 You Win!" : "🤖 Bot Wins!") << endl;
         gameOver = true;
     }
 }
 
 int main() {
     cout << "\033[2J\033[H";
-    
-    if (BOT_MODE == 0) {
-        cout << "👥 HUMAN vs HUMAN PONG" << endl;
-        cout << "Player 1: W (up) / S (down)" << endl;
-        cout << "Player 2: I (up) / K (down)" << endl;
-    } else if (BOT_MODE == 1) {
-        cout << "🧠 HUMAN vs BOT PONG" << endl;
-        cout << "You: W (up) / S (down)" << endl;
-        cout << "Bot: Auto-follows ball" << endl;
-    } else {
-        cout << "🤖 BOT vs BOT DEMO" << endl;
-        cout << "Smart Bot vs Patrol Bot" << endl;
-        cout << "Just watch them play!" << endl;
-    }
-    
-    cout << "Press Q to quit anytime" << endl;
-    cout << "First to 5 points wins!" << endl;
+    cout << "🧠 SIMPLE HUMAN vs BOT" << endl;
+    cout << "You: W (up) / S (down)" << endl;
+    cout << "Bot: Auto-follows ball" << endl;
     cout << "Starting in 2 seconds..." << endl;
     this_thread::sleep_for(chrono::seconds(2));
     

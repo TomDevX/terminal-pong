@@ -1,112 +1,81 @@
-# 🏓 Enhanced Pong Game Collection
+# 🏓 Enhanced Pong Game
 
-A comprehensive collection of classic Pong game implementations in C++ with multiple versions, enhanced features, and bug fixes.
+A stable, feature-rich Pong game implementation in C++ with dynamic speed and enhanced gameplay.
 
-## 🎮 Game Versions
+## 🎮 Game Modes
 
-### 1. **Stable Version** (`pong_stable_fixed.cpp`) ⭐ RECOMMENDED!
-- **Fixed ball reflection logic** - No more weird bouncing behavior
-- **No screen clearing** - Smooth gameplay without flickering
-- **Debug mode** - Press D to see ball and paddle info
-- **Multiple AI modes** - Smart AI and Patrol AI
-- **Cursor positioning** - Prevents screen disappearing
-- **Frame counter** - Shows game is running smoothly
+### 1. 👥 Human vs Human 
+- Two players on same keyboard
+- Player 1: W/S keys, Player 2: I/K keys
+- Dynamic speed increases with paddle hits
 
-### 2. **Working Version** (`pong_working.cpp`) 🔧 DEBUG
-- **Input testing** - Shows key presses for debugging
-- **Enhanced feedback** - Visual confirmation of actions
-- **Debug output** - Perfect for troubleshooting
-- **Fixed collision logic** - Improved ball physics
+### 2. 🧠 Human vs Bot
+- Play against intelligent AI
+- Smart AI predicts ball trajectory  
+- Player controls: W/S keys
 
-### 3. **Ultra Simple** (`pong_ultra_simple.cpp`) 🚀 FALLBACK
-- **Number input controls** - Uses 1,2,8,9,0 keys
-- **Guaranteed to work** - Perfect backup option
-- **Blocking input** - Turn-based style gameplay
-- **Simple interface** - Easy to understand
-
-### 4. **Enhanced Controls** (`pong_enhanced_controls.cpp`) 
-- **Arrow key support** - Full keyboard compatibility
-- **Pause functionality** - P to pause/resume
-- **Speed control** - Adjust game speed in real-time
-- **Advanced features** - Multiple control schemes
-
-### 5. **Legacy Versions**
-- `test.cpp` - Original enhanced version
-- `pong_simple.cpp` - Auto demo
-- `pong_interactive.cpp` - Turn-based gameplay
+### 3. 🤖 Bot vs Bot (Demo)
+- Watch AI vs AI gameplay
+- Smart Bot vs Patrol Bot
+- Controls: Q to quit only
 
 ## 🚀 How to Run
 
-### Method 1: Using the launcher script (Recommended)
+**Quick start:**
 ```bash
 ./run_game.sh
 ```
-Choose from 6 options:
-1. 👥 Human vs Human
-2. 🧠 Human vs Bot  
-3. 🤖 Bot vs Bot (Demo)
-4. 🛡️ Stable Version (Fixed disappearing screen)
-5. 🔧 Ultra Simple (If controls don't work)
-6. Exit
+Choose from 4 options:
+1. Human vs Human
+2. Human vs Bot  
+3. Bot vs Bot Demo
+4. Exit
 
-### Method 2: Quick launch (Ultra Simple)
+**Manual compilation:**
 ```bash
-./quick_pong
-```
-
-### Method 3: Compile and run manually
-```bash
-# Stable version (Human vs Bot):
+# Human vs Bot:
 g++ -std=c++11 -DBOT_MODE=1 pong_stable_fixed.cpp -o pong_game
 ./pong_game
-
-# Ultra simple version:
-g++ -std=c++11 pong_ultra_simple.cpp -o quick_pong
-./quick_pong
 ```
 
 ## 🕹️ Controls
 
-### Stable Version (pong_stable_fixed.cpp):
-- **Player 1 (Left Paddle):** W (up), S (down)
-- **Player 2 (Right Paddle):** I (up), K (down)
-- **Debug Mode:** D (toggle debug information)
-- **Quit:** Q
+**Human vs Human / Human vs Bot:**
+- Player 1: W (up), S (down)
+- Player 2: I (up), K (down) 
+- D: Toggle debug mode
+- Q: Quit game
 
-### Ultra Simple Version (pong_ultra_simple.cpp):
-- **Player 1:** 1 (up), 2 (down)
-- **Player 2:** 8 (up), 9 (down)  
-- **Quit:** 0
+**Bot vs Bot Demo:**
+- Q: Quit game only
 
-### Working Version (pong_working.cpp):
-- **Player 1:** W (up), S (down)
-- **Player 2:** I (up), K (down)
-- **Quit:** Q
-- **Debug output:** Shows key presses and movements
+## ✨ Key Features
 
-## 🎯 Recent Fixes & Improvements
+### 🚀 **Dynamic Speed System**
+- Speed increases every 3 paddle hits
+- Real-time speed display
+- Hit counter tracking
+- Speed preserved across rounds
 
-### ✅ Fixed Ball Reflection Logic (Latest Update!)
-- **Problem:** Ball would sometimes bounce back toward the same paddle
-- **Solution:** Added direction checking - ball only reflects when coming from correct direction
-- **Impact:** Much more realistic and predictable ball physics
+### 🎯 **Enhanced Gameplay**
+- Fixed ball reflection physics
+- Stable display (no screen flickering)
+- Smart AI with ball prediction
+- Multiple AI behaviors (Smart + Patrol)
 
-### ✅ Fixed Screen Disappearing 
-- **Problem:** Game screen would disappear after moving paddles
-- **Solution:** Used cursor positioning instead of screen clearing
-- **Impact:** Smooth, stable gameplay without flickering
+### 🔧 **Technical Excellence**
+- Non-blocking input handling
+- ANSI escape sequences for smooth display
+- Cursor positioning instead of screen clearing
+- Cross-platform compatibility (macOS/Linux)
 
-### ✅ Fixed Control Issues
-- **Problem:** Keys sometimes wouldn't register
-- **Solution:** Multiple input methods and debug feedback
-- **Impact:** Reliable controls with fallback options
+## 🎯 Recent Improvements
 
-### ✅ Enhanced AI Behavior
-- **Smart AI:** Predicts ball trajectory and moves intelligently  
-- **Patrol AI:** Moves in patterns for varied gameplay
-- **Balanced difficulty:** Challenging but beatable
-
-## 🎯 Enhanced Features
+✅ **Simplified game modes** - Only 3 core modes  
+✅ **Dynamic speed system** - Speed increases with hits  
+✅ **Bot vs Bot cleanup** - Removed unnecessary controls  
+✅ **Enhanced display** - Real-time speed and hit counters  
+✅ **Fixed ball physics** - Proper reflection logic
 
 ## 🎯 Enhanced Features
 
@@ -178,23 +147,32 @@ g++ -std=c++11 pong_ultra_simple.cpp -o quick_pong
 5. **Reset:** Ball resets to center after each score
 6. **AI:** Bots have different strategies - Smart AI predicts, Patrol AI moves in patterns
 
+## 🛠️ Requirements
+
+- C++ compiler (g++, clang++)
+- C++11 standard support  
+- macOS/Linux terminal with ANSI support
+
+## 📝 Game Rules
+
+1. **Objective:** Hit the ball with your paddle, don't let it pass
+2. **Scoring:** First player to 5 points wins
+3. **Speed:** Game gets faster every 3 paddle hits
+4. **Physics:** Ball bounces off top/bottom walls
+5. **AI:** Smart Bot predicts ball, Patrol Bot uses patterns
+
 ## 🎉 Quick Start
 
-**Want to play right now?**
 ```bash
 cd "/Users/tomimac/Downloads/terminal pong"
-./quick_pong
-```
-Use keys: 1↑ 2↓ (Player 1), 8↑ 9↓ (Player 2), 0 (Quit)
-
-**Want the full experience?**
-```bash
 ./run_game.sh
 ```
-Choose option 4 for the most stable version!
 
-Enjoy playing Pong! 🏓
-**Made by TomDev using GitHub Copilot ❤️!**
+**Want to watch AI battle?** Choose option 3 for Bot vs Bot demo!  
+**Want a challenge?** Choose option 2 for Human vs Bot!
+
+Enjoy the enhanced Pong experience! 🏓  
+*Made by TomDev using GitHub Copilot ❤️*
 
 ---
-*Last updated: August 13, 2025 - Fixed ball reflection logic and screen stability*
+*Last updated: August 13, 2025 - Added dynamic speed system and simplified game modes*
