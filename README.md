@@ -24,7 +24,7 @@ A modern, stable Pong game implementation in C++ with dynamic speed system and m
 - Different AI strategies in action
 - Just sit back and enjoy the show!
 
-## 🚀 **One-Click Play** (Recommended)
+## 🚀 **One-Click Play** (Recommended) - You just need to copy the command, paste in your terminal / command prompts, that's all, no complex download required
 
 ### **🪟 Windows (Command Prompt/PowerShell)**
 
