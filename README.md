@@ -1,8 +1,8 @@
 # 🏓 Terminal Pong Game
 
-A modern, stable Pong game implementation in C++ with dynamic speed system and multiple AI modes. **One-file download, instant play!**
+A modern, stable Pong game implementation in C++ with dynamic speed system and multiple AI modes. **One command, instant play!**
 
-![Game Demo](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue)
+![Game Demo](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 ![Language](https://img.shields.io/badge/Language-C%2B%2B11-orange)
 ![Status](https://img.shields.io/badge/Status-Stable-green)
 ![Downloads](https://img.shields.io/badge/Type-One--File%20Game-brightgreen)
@@ -26,28 +26,48 @@ A modern, stable Pong game implementation in C++ with dynamic speed system and m
 
 ## 🚀 **One-Click Play** (Recommended)
 
-### **Method 1: Direct Download & Play**
-```bash
-# Play instantly (one command):
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/TomDevX/terminal-pong/refs/tags/v5/terminal_pong_installer.sh)"
+### **🪟 Windows (Command Prompt/PowerShell)**
+
+**🚀 ULTRA SMOOTH (Zero Flicker)** - High-performance rendering:
+```cmd
+powershell -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_smooth.ps1'))"
 ```
 
-### **Method 2: Download File & Run (wget downloaded required)**
-```bash
-# Download the game file:
-wget https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh
-
-# Make it executable and run:
-chmod +x terminal_pong_installer.sh
-./terminal_pong_installer.sh
+**⚡ Standard** - Try this if **Ultra Smooth** doesn't work:
+```cmd
+powershell -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_simple_powershell.ps1'))"
 ```
 
-### **Method 3: Manual Download (also check the release)**
-1. [**Download terminal_pong_installer.sh**](https://github.com/TomDevX/terminal-pong/releases/download/v5/terminal_pong_installer.sh)
-2. Open Terminal and navigate to download folder
-3. Run: `chmod +x terminal_pong_installer.sh && ./terminal_pong_installer.sh`
+**🔧 Legacy Windows (All Versions)** - Only use this if none of the above works:
+```cmd
+curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_universal.bat -o pong.bat && pong.bat
+```
 
-🎯 **That's it!** The game will auto-compile and start with full menu.
+### **🐧 Linux/macOS (Terminal)**
+```bash
+# Download and play instantly:
+curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh | bash
+```
+
+### **📥 Manual Download (All Platforms)**
+| Platform | Download Link | Instructions |
+|----------|---------------|--------------|
+| **Windows (Instant)** | [📥 Download & Run](https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_powershell.ps1) | Right-click → Save As → Run with PowerShell |
+| **Windows (Auto)** | [📥 Download pong_auto.bat](https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_auto.bat) | Right-click → Save As → **Run as Administrator** |
+| **Windows (Simple)** | [📥 Download pong.bat](https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_simple.bat) | Right-click → Save As → Double-click to run |
+| **Linux/macOS** | [📥 Download pong.sh](https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh) | `chmod +x pong.sh && ./pong.sh` |
+
+🎯 **That's it!** The game will auto-compile and start.
+
+## 💡 **Windows Solutions Explained**
+
+| Method | Requirements | Performance | Best For |
+|--------|-------------|-------------|----------|
+| **🚀 Ultra Smooth** | PowerShell 3.0+ | **60fps, Zero flicker** | **Gamers** - Smoothest experience |
+| **⚡ Instant Play** | PowerShell 3.0+ | Standard 30fps | **Most users** - Good performance |
+| **🔧 Legacy Windows** | Any Windows | Demo mode | **Old systems** - Maximum compatibility |
+
+**Recommendation:** Try **Ultra Smooth** first for the best gaming experience!
 
 ## 🛠️ For Developers & Customization
 
@@ -100,12 +120,20 @@ cd terminal-pong
 
 ## 🛠️ Requirements
 
-- **For One-File Game:** Just a terminal with `g++` compiler
+### **🪟 Windows:**
+- **Command Prompt** or **PowerShell**
+- **C++ Compiler:** One of the following:
+  - MinGW-w64 (recommended): https://www.mingw-w64.org/
+  - MSYS2: https://www.msys2.org/
+  - Visual Studio Build Tools
+  - Git Bash (includes g++)
+
+### **🐧 Linux/macOS:**
+- **Terminal** with bash support
+- **C++ Compiler:** `g++` with C++11 support
   - macOS: `xcode-select --install` 
   - Ubuntu/Debian: `sudo apt install g++`
   - CentOS/RHEL: `sudo yum install gcc-c++`
-- **Platform:** macOS or Linux terminal with ANSI support
-- **No dependencies:** Game is self-contained
 
 ## ⚡ What Makes This Special
 
@@ -170,7 +198,7 @@ terminal-pong/
 ```
 
 ## 🎥 Demo
-### Terminal display
+
 ```
 🧠 HUMAN vs BOT (Frame: 45)
 Score: P1=2 P2=1 | Speed: 3x | Hits: 7
@@ -203,11 +231,11 @@ Controls: W/S (You), Q=quit
 
 | Action | Link |
 |--------|------|
-| 🎮 **Play Now** | [Download Game](https://github.com/TomDevX/terminal-pong/releases/download/v5/terminal_pong_installer.sh) |
+| 🎮 **Play Now** | [Download Game](https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh) |
 | 🔧 **Source Code** | [Download ZIP](https://github.com/TomDevX/terminal-pong/archive/main.zip) |
 | 📖 **Full Repo** | [Browse GitHub](https://github.com/TomDevX/terminal-pong) |
 | 🐛 **Report Issues** | [Create Issue](https://github.com/TomDevX/terminal-pong/issues) |
 
 **Made with ❤️ by TomDevX using GitHub Copilot**
 
-*Last updated: August 14, 2025 - Stable release with dynamic speed system*
+*Last updated: August 13, 2025 - Stable release with dynamic speed system*
