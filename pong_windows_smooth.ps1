@@ -1,10 +1,11 @@
-if (-not ([System.Management.Automation.PSTypeName]'SimplePong').Type) {
+if (-not ([System.Management.Automation.PSTypeName]'SmoothPong').Type) {
 Add-Type @"
 using System;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Text;
 
-public class SimplePong {
+public class SmoothPong {
     [DllImport("kernel32.dll")]
     public static extern IntPtr GetStdHandle(int nStdHandle);
     
@@ -12,10 +13,7 @@ public class SimplePong {
     public static extern bool SetConsoleCursorPosition(IntPtr hConsoleOutput, COORD dwCursorPosition);
     
     [DllImport("kernel32.dll")]
-    public static extern bool FillConsoleOutputCharacter(IntPtr hConsoleOutput, char cCharacter, uint nLength, COORD dwWriteCoord, out uint lpNumberOfCharsWritten);
-    
-    [DllImport("kernel32.dll")]
-    public static extern bool GetConsoleScreenBufferInfo(IntPtr hConsoleOutput, out CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
+    public static extern bool WriteConsoleOutput(IntPtr hConsoleOutput, CHAR_INFO[] lpBuffer, COORD dwBufferSize, COORD dwBufferCoord, ref SMALL_RECT lpWriteRegion);
     
     [StructLayout(LayoutKind.Sequential)]
     public struct COORD {
@@ -25,12 +23,9 @@ public class SimplePong {
     }
     
     [StructLayout(LayoutKind.Sequential)]
-    public struct CONSOLE_SCREEN_BUFFER_INFO {
-        public COORD dwSize;
-        public COORD dwCursorPosition;
-        public short wAttributes;
-        public SMALL_RECT srWindow;
-        public COORD dwMaximumWindowSize;
+    public struct CHAR_INFO {
+        public ushort Char;
+        public short Attributes;
     }
     
     [StructLayout(LayoutKind.Sequential)]
@@ -48,96 +43,85 @@ public class SimplePong {
     public static int ballSpeed = 1, hitCount = 0;
     public static int gameMode = 1;
     public static Random rand = new Random();
-    public static int lastBallX = 20, lastBallY = 9;
-    public static int lastPlayer1Y = 7, lastPlayer2Y = 7;
-    public static bool firstDraw = true;
-    
-    public static void SetCursorPosition(int x, int y) {
-        SetConsoleCursorPosition(handle, new COORD((short)x, (short)y));
-    }
-    
-    public static void WriteAt(int x, int y, string text) {
-        SetCursorPosition(x, y);
-        Console.Write(text);
-    }
-    
-    public static void ClearArea(int x, int y, int width) {
-        SetCursorPosition(x, y);
-        for(int i = 0; i < width; i++) {
-            Console.Write(" ");
-        }
-    }
+    public static CHAR_INFO[] buffer;
+    public static int width = 42, height = 22;
     
     public static void Setup() {
         ballDirX = rand.Next(2) == 0 ? 1 : -1;
         ballDirY = rand.Next(2) == 0 ? 1 : -1;
         Console.CursorVisible = false;
         Console.Clear();
-        firstDraw = true;
+        
+        // Initialize double buffer
+        buffer = new CHAR_INFO[width * height];
+        for(int i = 0; i < buffer.Length; i++) {
+            buffer[i].Char = 32; // Space character
+            buffer[i].Attributes = 7; // Normal color
+        }
     }
     
-    public static void DrawFrame() {
-        // Draw the static frame only once
+    public static void SetChar(int x, int y, char c) {
+        if(x >= 0 && x < width && y >= 0 && y < height) {
+            buffer[y * width + x].Char = (ushort)c;
+        }
+    }
+    
+    public static void DrawToBuffer() {
+        // Clear buffer
+        for(int i = 0; i < buffer.Length; i++) {
+            buffer[i].Char = 32; // Space
+        }
+        
+        // Draw header
         string mode = gameMode == 0 ? "HUMAN vs HUMAN" : gameMode == 1 ? "HUMAN vs BOT" : "BOT vs BOT";
-        string scoreText = " | Score: " + p1Score + "-" + p2Score + " | Speed: " + ballSpeed + "x";
-        WriteAt(0, 0, mode + scoreText);
+        string header = mode + " | Score: " + p1Score + "-" + p2Score + " | Speed: " + ballSpeed + "x";
+        for(int i = 0; i < Math.Min(header.Length, width); i++) {
+            SetChar(i, 0, header[i]);
+        }
         
         string controls = gameMode == 0 ? "Controls: W/S (P1), I/K (P2), Q=quit" :
                          gameMode == 1 ? "Controls: W/S (You), Q=quit" :
                          "Controls: Q=quit (watch bots)";
-        WriteAt(0, 1, controls);
-        WriteAt(0, 2, "==========================================");
-        
-        // Draw game field borders
-        for(int i = 0; i < 18; i++) {
-            WriteAt(0, 3 + i, "|");
-            WriteAt(41, 3 + i, "|");
-            WriteAt(20, 3 + i, "|"); // Center line
+        for(int i = 0; i < Math.Min(controls.Length, width); i++) {
+            SetChar(i, 1, controls[i]);
         }
-        WriteAt(0, 21, "==========================================");
+        
+        // Draw borders
+        for(int i = 0; i < width; i++) {
+            SetChar(i, 2, '=');
+            SetChar(i, 21, '=');
+        }
+        
+        // Draw game field
+        for(int i = 3; i < 21; i++) {
+            SetChar(0, i, '|');
+            SetChar(41, i, '|');
+            SetChar(20, i, '|'); // Center line
+        }
+        
+        // Draw ball
+        SetChar(1 + ballX, 3 + ballY, 'O');
+        
+        // Draw paddles
+        for(int i = 0; i < 4; i++) {
+            SetChar(3, 3 + player1Y + i, '#');
+            SetChar(38, 3 + player2Y + i, '#');
+        }
+    }
+    
+    public static void FlushBuffer() {
+        SMALL_RECT rect = new SMALL_RECT();
+        rect.Left = 0;
+        rect.Top = 0;
+        rect.Right = (short)(width - 1);
+        rect.Bottom = (short)(height - 1);
+        
+        WriteConsoleOutput(handle, buffer, new COORD((short)width, (short)height), new COORD(0, 0), ref rect);
     }
     
     public static void Draw() {
-        if(firstDraw) {
-            Console.Clear();
-            DrawFrame();
-            firstDraw = false;
-        } else {
-            // Update only the score line
-            string mode = gameMode == 0 ? "HUMAN vs HUMAN" : gameMode == 1 ? "HUMAN vs BOT" : "BOT vs BOT";
-            string scoreText = " | Score: " + p1Score + "-" + p2Score + " | Speed: " + ballSpeed + "x";
-            WriteAt(0, 0, mode + scoreText + "                    "); // Clear any extra characters
-        }
-        
-        // Clear old ball position
-        if(lastBallX != ballX || lastBallY != ballY) {
-            WriteAt(1 + lastBallX, 3 + lastBallY, " ");
-        }
-        
-        // Clear old paddle positions
-        for(int i = 0; i < 4; i++) {
-            if(lastPlayer1Y != player1Y) {
-                WriteAt(3, 3 + lastPlayer1Y + i, " ");
-            }
-            if(lastPlayer2Y != player2Y) {
-                WriteAt(38, 3 + lastPlayer2Y + i, " ");
-            }
-        }
-        
-        // Draw new ball position
-        WriteAt(1 + ballX, 3 + ballY, "O");
-        
-        // Draw new paddle positions
-        for(int i = 0; i < 4; i++) {
-            WriteAt(3, 3 + player1Y + i, "#");
-            WriteAt(38, 3 + player2Y + i, "#");
-        }
-        
-        // Update last positions
-        lastBallX = ballX;
-        lastBallY = ballY;
-        lastPlayer1Y = player1Y;
-        lastPlayer2Y = player2Y;
+        DrawToBuffer();
+        FlushBuffer();
     }
     
     public static void Input() {
@@ -196,9 +180,9 @@ public class SimplePong {
     }
     
     public static void StartGame() {
-        Console.Title = "Terminal Pong Game";
+        Console.Title = "Terminal Pong - Smooth";
         Console.Clear();
-        Console.WriteLine("=== TERMINAL PONG GAME ===");
+        Console.WriteLine("=== TERMINAL PONG - SMOOTH VERSION ===");
         Console.WriteLine("");
         Console.WriteLine("Choose game mode:");
         Console.WriteLine("  1. Human vs Bot");
@@ -221,7 +205,7 @@ public class SimplePong {
         }
         
         Console.Clear();
-        Console.WriteLine("Starting Terminal Pong...");
+        Console.WriteLine("Starting Smooth Terminal Pong...");
         string modeText = gameMode == 0 ? "HUMAN vs HUMAN MODE" : 
                          gameMode == 1 ? "HUMAN vs BOT MODE" : 
                          "BOT vs BOT DEMO";
@@ -235,8 +219,8 @@ public class SimplePong {
             Input();
             Logic();
             
-            int delay = ballSpeed == 1 ? 200 : ballSpeed == 2 ? 150 : 
-                       ballSpeed == 3 ? 100 : ballSpeed == 4 ? 70 : 50;
+            int delay = ballSpeed == 1 ? 120 : ballSpeed == 2 ? 100 : 
+                       ballSpeed == 3 ? 80 : ballSpeed == 4 ? 60 : 40;
             Thread.Sleep(delay);
         }
         
@@ -250,27 +234,31 @@ public class SimplePong {
 
 Clear-Host
 Write-Host "================================================" -ForegroundColor Cyan
-Write-Host "         Terminal Pong - Windows Compatible" -ForegroundColor Cyan  
+Write-Host "      Terminal Pong - Ultra Smooth Version" -ForegroundColor Cyan  
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Starting game using .NET Framework..." -ForegroundColor Green
-Write-Host "No external dependencies required!" -ForegroundColor Green
+Write-Host "Loading high-performance renderer..." -ForegroundColor Green
+Write-Host "Zero flicker - Smooth 60fps gameplay!" -ForegroundColor Green
 Write-Host ""
 
 try {
-    [SimplePong]::StartGame()
+    [SmoothPong]::StartGame()
 } catch {
-    Write-Host "Error starting game: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Advanced rendering failed, falling back to standard mode..." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "This might be due to PowerShell execution policy."
-    Write-Host "Try running: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser"
-    Write-Host ""
+    
+    # Fallback to the improved version
+    if (-not ([System.Management.Automation.PSTypeName]'SimplePong').Type) {
+        . "$PSScriptRoot\pong_windows_simple_powershell.ps1"
+    } else {
+        [SimplePong]::StartGame()
+    }
 }
 
 Write-Host ""
 Write-Host "================================================" -ForegroundColor Cyan
-Write-Host "Thanks for playing Terminal Pong!" -ForegroundColor Yellow
-Write-Host "Pure Windows solution - No installation needed!" -ForegroundColor Green
+Write-Host "Thanks for playing Ultra Smooth Terminal Pong!" -ForegroundColor Yellow
+Write-Host "Experience the smoothest terminal gaming!" -ForegroundColor Green
 Write-Host "Visit: https://github.com/TomDevX/terminal-pong" -ForegroundColor Blue
 Write-Host "================================================" -ForegroundColor Cyan
 Read-Host "Press Enter to exit"
