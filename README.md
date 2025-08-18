@@ -28,7 +28,7 @@ A modern, stable Pong game implementation in C++ with dynamic speed system and m
 
 ### **🪟 Windows (Command Prompt/PowerShell)**
 
-**🚀 ULTRA SMOOTH (Zero Flicker)** - High-performance rendering:
+**🚀 ULTRA SMOOTH (Recommended)** - High-performance rendering:
 ```cmd
 powershell -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_smooth.ps1'))"
 ```
@@ -38,15 +38,10 @@ powershell -Command "iex ((New-Object System.Net.WebClient).DownloadString('http
 powershell -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_simple_powershell.ps1'))"
 ```
 
-**🔧 Legacy Windows (All Versions)** - Only use this if none of the above works:
-```cmd
-curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/pong_windows_universal.bat -o pong.bat && pong.bat
-```
-
 ### **🐧 Linux/macOS (Terminal)**
 ```bash
-# Download and play instantly:
-curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_pong_installer.sh | bash
+# Paste the command in terminal and play instantly:
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/TomDevX/terminal-pong/refs/tags/v4/terminal_pong_installer.sh)"
 ```
 
 ### **📥 Manual Download (All Platforms)**
@@ -63,9 +58,8 @@ curl -L https://raw.githubusercontent.com/TomDevX/terminal-pong/main/terminal_po
 
 | Method | Requirements | Performance | Best For |
 |--------|-------------|-------------|----------|
-| **🚀 Ultra Smooth** | PowerShell 3.0+ | **60fps, Zero flicker** | **Gamers** - Smoothest experience |
-| **⚡ Instant Play** | PowerShell 3.0+ | Standard 30fps | **Most users** - Good performance |
-| **🔧 Legacy Windows** | Any Windows | Demo mode | **Old systems** - Maximum compatibility |
+| **🚀 Ultra Smooth** | PowerShell 3.0+ | **60fps, Zero flicker** | **Most users** - Smoothest experience |
+| **⚡ Instant Play** | PowerShell 3.0+ | Standard 30fps | **For those who wanna try some bugs as features** - Good performance |
 
 **Recommendation:** Try **Ultra Smooth** first for the best gaming experience!
 
@@ -236,6 +230,6 @@ Controls: W/S (You), Q=quit
 | 📖 **Full Repo** | [Browse GitHub](https://github.com/TomDevX/terminal-pong) |
 | 🐛 **Report Issues** | [Create Issue](https://github.com/TomDevX/terminal-pong/issues) |
 
-**Made with ❤️ by TomDevX using GitHub Copilot**
+**Made with ❤️ by TomDevX**
 
-*Last updated: August 13, 2025 - Stable release with dynamic speed system*
+*Last updated: August 18, 2025 - Stable release with dynamic speed system*
