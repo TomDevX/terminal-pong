@@ -142,7 +142,7 @@ echo WScript.Echo "  1. Human vs Bot"
 echo WScript.Echo "  2. Human vs Human"
 echo WScript.Echo "  3. Bot vs Bot ^(Demo^)"
 echo WScript.Echo ""
-echo choice = InputBox^("Enter choice ^(1-3^):", "Terminal Pong"^)
+echo choice = InputBox("Enter choice (1-3):", "Terminal Pong")
 echo.
 echo Select Case choice
 echo     Case "1": gameMode = 1
