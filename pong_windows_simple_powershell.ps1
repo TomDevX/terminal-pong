@@ -1,34 +1,15 @@
-if (-not ([System.Management.Automation.PSTypeName]'PongGame').Type) {
+if (-not ([System.Management.Automation.PSTypeName]'SimplePong').Type) {
 Add-Type @"
 using System;
 using System.Threading;
-using System.Runtime.InteropServices;
 
-public class PongGame {
-    [DllImport("kernel32.dll")]
-    public static extern IntPtr GetStdHandle(int nStdHandle);
-    
-    [DllImport("kernel32.dll")]
-    public static extern bool SetConsoleCursorPosition(IntPtr hConsoleOutput, COORD dwCursorPosition);
-    
-    [StructLayout(LayoutKind.Sequential)]
-    public struct COORD {
-        public short X;
-        public short Y;
-        public COORD(short x, short y) { X = x; Y = y; }
-    }
-    
-    public static IntPtr handle = GetStdHandle(-11);
+public class SimplePong {
     public static bool gameOver = false;
     public static int ballX = 20, ballY = 9, ballDirX = 1, ballDirY = 1;
     public static int player1Y = 7, player2Y = 7, p1Score = 0, p2Score = 0;
     public static int ballSpeed = 1, hitCount = 0;
     public static int gameMode = 1;
     public static Random rand = new Random();
-    
-    public static void SetCursorPosition(int x, int y) {
-        SetConsoleCursorPosition(handle, new COORD((short)x, (short)y));
-    }
     
     public static void Setup() {
         ballDirX = rand.Next(2) == 0 ? 1 : -1;
@@ -120,12 +101,12 @@ public class PongGame {
         Console.Title = "Terminal Pong Game";
         Console.Clear();
         Console.WriteLine("=== TERMINAL PONG GAME ===");
-        Console.WriteLine();
+        Console.WriteLine("");
         Console.WriteLine("Choose game mode:");
         Console.WriteLine("  1. Human vs Bot");
         Console.WriteLine("  2. Human vs Human");
         Console.WriteLine("  3. Bot vs Bot (Demo)");
-        Console.WriteLine();
+        Console.WriteLine("");
         Console.Write("Enter choice (1-3): ");
         
         string choice = Console.ReadLine();
@@ -161,7 +142,7 @@ public class PongGame {
             Thread.Sleep(delay);
         }
         
-        Console.WriteLine();
+        Console.WriteLine("");
         Console.WriteLine("Thanks for playing! Press any key to exit...");
         Console.ReadKey(true);
     }
@@ -169,15 +150,24 @@ public class PongGame {
 "@
 }
 
+Clear-Host
 Write-Host "================================================" -ForegroundColor Cyan
-Write-Host "         Terminal Pong - Pure PowerShell" -ForegroundColor Cyan  
+Write-Host "         Terminal Pong - Windows Compatible" -ForegroundColor Cyan  
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "🎮 Starting game using built-in Windows technologies..." -ForegroundColor Green
-Write-Host "💾 No external dependencies required!" -ForegroundColor Green
+Write-Host "Starting game using .NET Framework..." -ForegroundColor Green
+Write-Host "No external dependencies required!" -ForegroundColor Green
 Write-Host ""
 
-[PongGame]::StartGame()
+try {
+    [SimplePong]::StartGame()
+} catch {
+    Write-Host "Error starting game: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "This might be due to PowerShell execution policy."
+    Write-Host "Try running: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser"
+    Write-Host ""
+}
 
 Write-Host ""
 Write-Host "================================================" -ForegroundColor Cyan
